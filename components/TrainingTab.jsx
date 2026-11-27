@@ -68,7 +68,7 @@ export default function TrainingTab({ onStart, onGoShop }) {
         />
 
         {/* 마스코트 + 말풍선 */}
-        <div className="relative z-10 flex items-end px-3 pt-2">
+        <div className="relative z-10 flex items-end px-3 pt-14">
           <Grion rank={rankIndex} size={165} anim="talk" className="-mb-2 shrink-0 drop-shadow-md" />
           <Bubble className="mb-14 -ml-2 flex-1 shadow-md">{bubbleText}</Bubble>
         </div>
