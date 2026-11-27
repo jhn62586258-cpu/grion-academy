@@ -3,6 +3,7 @@ import './globals.css';
 
 const kotraHope = localFont({
   src: '../public/images/KOTRAHOPE.ttf',
+  variable: '--font-kotra',
   display: 'swap',
 });
 
@@ -20,7 +21,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ko" className={kotraHope.className}>
+    <html lang="ko" className={`${kotraHope.variable} ${kotraHope.className}`}>
       <body>{children}</body>
     </html>
   );
