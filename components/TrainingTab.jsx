@@ -67,10 +67,12 @@ export default function TrainingTab({ onStart, onGoShop }) {
           className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top"
         />
 
-        {/* 마스코트 + 말풍선 */}
-        <div className="relative z-10 flex items-end px-3 pt-14">
-          <Grion rank={rankIndex} size={165} anim="talk" className="-mb-2 shrink-0 drop-shadow-md" />
-          <Bubble className="mb-14 -ml-2 flex-1 shadow-md">{bubbleText}</Bubble>
+        {/* 마스코트 + 한 줄 말풍선 */}
+        <div className="relative z-10 flex items-end px-2 pt-24">
+          <Grion rank={rankIndex} size={150} anim="talk" className="-mb-2 shrink-0 drop-shadow-md" />
+          <Bubble className="mb-14 -ml-3 flex-1 !px-3 !py-2.5 !text-[1.02rem] whitespace-nowrap tracking-tight shadow-md">
+            {bubbleText}
+          </Bubble>
         </div>
 
         {/* 깃발: 현재 스테이지 옆 */}
