@@ -1,10 +1,23 @@
+@font-face {
+  font-family: 'AprilCustom';
+  src: url('/images/April16th-Promise.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+* {
+  font-family: 'AprilCustom', sans-serif !important;
+}
+
 html,
 body {
   min-height: 100%;
+  font-family: 'AprilCustom', sans-serif !important;
 }
 
 body {
@@ -108,8 +121,4 @@ body {
 }
 .no-scrollbar {
   scrollbar-width: none;
-}
-
-* {
-  font-family: var(--font-kotra), sans-serif !important;
 }
