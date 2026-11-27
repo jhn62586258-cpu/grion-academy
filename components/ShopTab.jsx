@@ -6,6 +6,11 @@ import { useApp } from '@/lib/AppContext';
 import { CONSUMABLES, TITLES } from '@/lib/shop';
 import { BiscuitIcon } from './ui';
 
+const CONSUMABLE_IMG = {
+  hint: '/images/item_map.png',
+  shield: '/images/item_vest.png',
+};
+
 export default function ShopTab() {
   const { user, buy, equip, toast } = useApp();
   const [busyId, setBusyId] = useState(null);
@@ -17,7 +22,7 @@ export default function ShopTab() {
     setBusyId(item.id);
     try {
       await buy(item.id);
-      toast(`${item.emoji} ${item.name} 보급 완료!`);
+      toast(`${item.name} 보급 완료!`);
     } catch (e) {
       if (e?.message === 'NOT_ENOUGH') toast('건빵이 부족해요. 훈련으로 모아 보세요!');
       else if (e?.message === 'ALREADY_OWNED') toast('이미 가지고 있는 칭호예요.');
@@ -52,10 +57,15 @@ export default function ShopTab() {
         {CONSUMABLES.map((item) => {
           const have = user?.items?.[item.kind] || 0;
           const canBuy = biscuits >= item.price;
+          const imgSrc = CONSUMABLE_IMG[item.kind];
           return (
             <li key={item.id} className="card-3d flex items-center gap-3 p-3">
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-grion-50 text-4xl">
-                {item.emoji}
+              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-grion-50 p-2 text-4xl">
+                {imgSrc ? (
+                  <img src={imgSrc} alt={item.name} className="h-full w-full object-contain" />
+                ) : (
+                  item.emoji
+                )}
               </span>
               <div className="min-w-0 flex-1">
                 <p className="font-display text-xl text-forest">
@@ -84,8 +94,8 @@ export default function ShopTab() {
           const canBuy = biscuits >= item.price;
           return (
             <li key={item.id} className="card-3d flex items-center gap-3 p-3">
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-yellow-50 text-4xl">
-                {item.emoji}
+              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-yellow-50 p-2 text-4xl">
+                <img src="/images/item_badge.png" alt={item.name} className="h-full w-full object-contain" />
               </span>
               <div className="min-w-0 flex-1">
                 <p className="font-display text-xl text-forest">{item.name}</p>
