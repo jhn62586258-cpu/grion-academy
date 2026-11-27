@@ -8,7 +8,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // 에메랄드/라임 그린 계열 (시안의 메인 컬러)
         grion: {
           50: '#f2fbe9',
           100: '#e0f5c8',
@@ -21,13 +20,13 @@ module.exports = {
           800: '#245417',
           900: '#1a3c14',
         },
-        forest: '#1f4d2b', // 제목용 짙은 군복 그린
+        forest: '#1f4d2b',
         gold: { 400: '#ffd43b', 500: '#ffc800', 600: '#d19f00' },
         sky: { soft: '#cfeeff' },
       },
       fontFamily: {
-        display: ['Jua', 'Noto Sans KR', 'sans-serif'],
-        sans: ['Noto Sans KR', 'system-ui', 'sans-serif'],
+        display: ['KOTRAHOPE', 'sans-serif'],
+        sans: ['KOTRAHOPE', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         float: {
