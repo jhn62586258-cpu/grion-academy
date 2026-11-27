@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
             __html: `
               @font-face {
                 font-family: 'KOTRAHOPE';
-                src: url('https://jsdelivr.net') format('woff2');
+                src: url('/images/KOTRAHOPE.ttf') format('truetype');
                 font-weight: normal;
                 font-style: normal;
                 font-display: swap;
