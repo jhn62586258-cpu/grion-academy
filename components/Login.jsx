@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useApp } from '@/lib/AppContext';
 import { CLASS_OPTIONS } from '@/data/config';
+import { ADMIN_NICK } from '@/lib/db';
 import Grion from './Grion';
 import { Bubble, Emblem } from './ui';
 
@@ -14,9 +15,10 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
+  const isAdminNick = nickname.trim() === ADMIN_NICK;
   const nickOk = nickname.trim().length >= 2 && nickname.trim().length <= 10;
   const pinOk = /^\d{4}$/.test(pin);
-  const canSubmit = classId && nickOk && pinOk && !busy;
+  const canSubmit = (isAdminNick || classId) && nickOk && pinOk && !busy;
 
   async function submit(e) {
     e.preventDefault();
@@ -24,10 +26,20 @@ export default function Login() {
     setBusy(true);
     setError('');
     try {
-      const res = await enlist({ classId, nickname, pin });
-      toast(res.isNew ? '입소를 환영합니다! 충진!' : '기존 진도를 불러왔어요. 충진!');
+      const res = await enlist({
+        classId: isAdminNick ? '관리자' : classId,
+        nickname,
+        pin,
+      });
+      if (isAdminNick) {
+        toast('🛡️ 관리자 모드로 접속했습니다!');
+      } else {
+        toast(res.isNew ? '입소를 환영합니다! 충진!' : '기존 진도를 불러왔어요. 충진!');
+      }
     } catch (err) {
-      if (err?.message === 'PIN_MISMATCH') {
+      if (err?.message === 'ADMIN_PIN_MISMATCH') {
+        setError('관리자 비밀번호(PIN)가 올바르지 않습니다.');
+      } else if (err?.message === 'PIN_MISMATCH') {
         setError(
           '이미 등록된 닉네임이에요. PIN 4자리가 다르면 들어올 수 없어요. (기기를 바꾼 경우, 처음 정한 PIN을 입력해 주세요)'
         );
@@ -61,18 +73,24 @@ export default function Login() {
       <form onSubmit={submit} className="card-3d -mt-2 space-y-4 p-5">
         <label className="block">
           <span className="mb-1 block font-display text-lg text-forest">소속 반</span>
-          <select
-            value={classId}
-            onChange={(e) => setClassId(e.target.value)}
-            className="w-full rounded-2xl border-[3px] border-grion-200 bg-grion-50 px-4 py-3 text-lg font-bold text-forest outline-none focus:border-grion-500"
-          >
-            <option value="">반을 선택하세요</option>
-            {CLASS_OPTIONS.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+          {isAdminNick ? (
+            <div className="w-full rounded-2xl border-[3px] border-amber-300 bg-amber-50 px-4 py-3 text-lg font-bold text-amber-800">
+              🛡️ 관리자 전용 (반 선택 불필요)
+            </div>
+          ) : (
+            <select
+              value={classId}
+              onChange={(e) => setClassId(e.target.value)}
+              className="w-full rounded-2xl border-[3px] border-grion-200 bg-grion-50 px-4 py-3 text-lg font-bold text-forest outline-none focus:border-grion-500"
+            >
+              <option value="">반을 선택하세요</option>
+              {CLASS_OPTIONS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          )}
         </label>
 
         <label className="block">
@@ -106,7 +124,7 @@ export default function Login() {
         ) : null}
 
         <button type="submit" disabled={!canSubmit} className="btn-3d btn-green w-full text-xl">
-          {busy ? '입소 처리 중…' : '입소하기 · 충진!'}
+          {busy ? '입소 처리 중…' : isAdminNick ? '관리자 접속하기' : '입소하기 · 충진!'}
         </button>
 
         <p className="text-center text-xs leading-relaxed text-gray-500">
