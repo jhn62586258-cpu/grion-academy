@@ -1,18 +1,29 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Heart, MessageCircle, Send, ShieldCheck } from 'lucide-react';
+import { Heart, MessageCircle, Send, ShieldCheck, Trash2 } from 'lucide-react';
 import { useApp } from '@/lib/AppContext';
-import { addComment, postLetter, subscribeComments, subscribeLetters, toggleHeart } from '@/lib/db';
+import {
+  addComment,
+  adminDeleteComment,
+  adminDeleteLetter,
+  isAdminUser,
+  postLetter,
+  subscribeComments,
+  subscribeLetters,
+  toggleHeart,
+} from '@/lib/db';
 import { getDeviceId, timeAgo } from '@/lib/grade';
 import Grion from './Grion';
 
 export default function LettersTab() {
-  const { toast, rankIndex } = useApp();
+  const { user, toast, rankIndex } = useApp();
   const [letters, setLetters] = useState([]);
   const [text, setText] = useState('');
   const [posting, setPosting] = useState(false);
   const [deviceId, setDeviceId] = useState('');
+
+  const isAdmin = isAdminUser(user);
 
   useEffect(() => {
     setDeviceId(getDeviceId());
@@ -42,8 +53,8 @@ export default function LettersTab() {
         <div className="flex items-center gap-3">
           <Grion rank={rankIndex} size={72} anim="float" className="shrink-0" />
           <p className="text-sm font-bold leading-relaxed text-forest">
-            교육 현장의 고충, 건의사항, 감사를 <span className="text-grion-600">익명</span>으로 나눠요.
-            서로 하트와 응원 댓글로 힘이 되어 주세요!
+            교사를 하면서의 어려움, 신앙생활의 기쁨, 말씀의 나눔 등 마음속 이야기를{' '}
+            <span className="text-grion-600">익명</span>으로 나눠요. 서로 하트와 응원 댓글로 힘이 되어 주세요!
           </p>
         </div>
         <form onSubmit={submit} className="mt-3">
@@ -52,7 +63,7 @@ export default function LettersTab() {
             onChange={(e) => setText(e.target.value)}
             maxLength={500}
             rows={4}
-            placeholder="마음속 이야기를 편하게 적어 주세요. (아이·학부모·동료의 실명은 적지 말아 주세요)"
+            placeholder="마음속 이야기를 편하게 적어 주세요. (욕설·비방 등은 자동 삭제됩니다.)"
             className="w-full resize-none rounded-2xl border-[3px] border-grion-200 bg-grion-50 p-3 text-[0.95rem] font-medium leading-relaxed text-forest outline-none placeholder:text-gray-400 focus:border-grion-500"
           />
           <div className="mt-2 flex items-center justify-between">
@@ -74,14 +85,14 @@ export default function LettersTab() {
           </li>
         )}
         {letters.map((l) => (
-          <LetterCard key={l.id} letter={l} deviceId={deviceId} toast={toast} />
+          <LetterCard key={l.id} letter={l} deviceId={deviceId} isAdmin={isAdmin} toast={toast} />
         ))}
       </ul>
     </div>
   );
 }
 
-function LetterCard({ letter, deviceId, toast }) {
+function LetterCard({ letter, deviceId, isAdmin, toast }) {
   const [open, setOpen] = useState(false);
   const hearted = useMemo(() => (letter.heartedBy || []).includes(deviceId), [letter.heartedBy, deviceId]);
 
@@ -94,9 +105,32 @@ function LetterCard({ letter, deviceId, toast }) {
     }
   }
 
+  async function removeLetter() {
+    if (!window.confirm('이 편지와 달린 댓글을 모두 삭제할까요?')) return;
+    try {
+      await adminDeleteLetter(letter.id);
+      toast('🗑️ 편지를 삭제했습니다.');
+    } catch {
+      toast('삭제에 실패했습니다.');
+    }
+  }
+
   return (
     <li className="card-3d p-4">
-      <p className="whitespace-pre-wrap break-words text-[0.97rem] font-medium leading-relaxed text-forest">{letter.text}</p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="whitespace-pre-wrap break-words text-[0.97rem] font-medium leading-relaxed text-forest flex-1">
+          {letter.text}
+        </p>
+        {isAdmin && (
+          <button
+            onClick={removeLetter}
+            className="shrink-0 rounded-xl bg-red-50 p-1.5 text-red-500 active:scale-90"
+            aria-label="편지 삭제"
+          >
+            <Trash2 size={16} />
+          </button>
+        )}
+      </div>
       <div className="mt-3 flex items-center justify-between">
         <span className="text-xs font-bold text-gray-400">익명 교사 · {timeAgo(letter.createdAt)}</span>
         <div className="flex items-center gap-2">
@@ -119,12 +153,12 @@ function LetterCard({ letter, deviceId, toast }) {
           </button>
         </div>
       </div>
-      {open && <Comments letterId={letter.id} toast={toast} />}
+      {open && <Comments letterId={letter.id} isAdmin={isAdmin} toast={toast} />}
     </li>
   );
 }
 
-function Comments({ letterId, toast }) {
+function Comments({ letterId, isAdmin, toast }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -145,14 +179,35 @@ function Comments({ letterId, toast }) {
     }
   }
 
+  async function removeComment(commentId) {
+    if (!window.confirm('이 댓글을 삭제할까요?')) return;
+    try {
+      await adminDeleteComment(letterId, commentId);
+      toast('🗑️ 댓글을 삭제했습니다.');
+    } catch {
+      toast('댓글 삭제에 실패했습니다.');
+    }
+  }
+
   return (
     <div className="mt-3 animate-fadeIn border-t-2 border-dashed border-grion-100 pt-3">
       <ul className="space-y-2">
         {comments.length === 0 && <li className="text-xs font-bold text-gray-400">첫 응원 댓글을 남겨 주세요 💚</li>}
         {comments.map((c) => (
-          <li key={c.id} className="rounded-2xl rounded-tl-sm bg-grion-50 px-3 py-2">
-            <p className="whitespace-pre-wrap break-words text-sm font-medium leading-snug text-forest">{c.text}</p>
-            <p className="mt-0.5 text-[0.7rem] font-bold text-gray-400">익명 · {timeAgo(c.createdAt)}</p>
+          <li key={c.id} className="flex items-start justify-between gap-2 rounded-2xl rounded-tl-sm bg-grion-50 px-3 py-2">
+            <div className="min-w-0 flex-1">
+              <p className="whitespace-pre-wrap break-words text-sm font-medium leading-snug text-forest">{c.text}</p>
+              <p className="mt-0.5 text-[0.7rem] font-bold text-gray-400">익명 · {timeAgo(c.createdAt)}</p>
+            </div>
+            {isAdmin && (
+              <button
+                onClick={() => removeComment(c.id)}
+                className="shrink-0 rounded-lg bg-red-50 p-1 text-red-500 active:scale-90"
+                aria-label="댓글 삭제"
+              >
+                <Trash2 size={14} />
+              </button>
+            )}
           </li>
         ))}
       </ul>
