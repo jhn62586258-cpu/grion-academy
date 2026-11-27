@@ -16,11 +16,21 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ko">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap"
-          rel="stylesheet"
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              @font-face {
+                font-family: 'KOTRAHOPE';
+                src: url('https://jsdelivr.net') format('woff2');
+                font-weight: normal;
+                font-style: normal;
+                font-display: swap;
+              }
+              html, body, * {
+                font-family: 'KOTRAHOPE', sans-serif !important;
+              }
+            `,
+          }}
         />
       </head>
       <body>{children}</body>
