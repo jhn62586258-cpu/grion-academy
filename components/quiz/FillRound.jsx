@@ -10,7 +10,6 @@ export default function FillRound({ items, api }) {
   const [qi, setQi] = useState(0);
   const item = items[qi];
 
-  // 문항이 바뀔 때마다 새로 계산
   const parts = useMemo(() => parseBlanks(item.text), [item]);
   const answers = useMemo(() => parts.filter((p) => p.type === 'blank').map((p) => p.answer), [parts]);
   const bank = useMemo(
@@ -18,9 +17,9 @@ export default function FillRound({ items, api }) {
     [answers, item]
   );
 
-  const [filled, setFilled] = useState(() => answers.map(() => null)); // 빈칸별 chip id
-  const [locked, setLocked] = useState(() => answers.map(() => false)); // 힌트로 확정된 칸
-  const [status, setStatus] = useState(null); // null | 'wrong' | 'right'
+  const [filled, setFilled] = useState(() => answers.map(() => null));
+  const [locked, setLocked] = useState(() => answers.map(() => false));
+  const [status, setStatus] = useState(null);
   const [wrongSlots, setWrongSlots] = useState([]);
   const hadMistake = useRef(false);
 
@@ -62,7 +61,6 @@ export default function FillRound({ items, api }) {
   }
 
   function retry() {
-    // 틀린 칸만 비우고 다시 시도
     setFilled((f) => f.map((v, i) => (wrongSlots.includes(i) && !locked[i] ? null : v)));
     setWrongSlots([]);
     setStatus(null);
@@ -70,7 +68,6 @@ export default function FillRound({ items, api }) {
 
   function useHint() {
     if (status === 'right') return;
-    // 아직 정답이 아닌 첫 칸을 정답으로 채워서 확정
     const slot = answers.findIndex((ans, i) => !locked[i] && wordOf(filled[i]) !== ans);
     if (slot === -1) return;
     if (!api.onHint()) return;
@@ -99,20 +96,20 @@ export default function FillRound({ items, api }) {
   }
 
   return (
-    <div className={status ? 'pb-72' : 'pb-10'}>
-      <div className="mb-3 flex items-center justify-between">
-        <span className="rounded-full bg-grion-100 px-3 py-1 font-display text-base text-grion-700">
+    <div className={status ? 'pb-56' : 'pb-6'}>
+      <div className="mb-2 flex items-center justify-between">
+        <span className="rounded-full bg-grion-100 px-3 py-0.5 text-sm text-grion-700">
           {qi + 1} / {items.length}
         </span>
         <HintButton count={api.hints} onClick={useHint} disabled={status === 'right'} />
       </div>
 
       {/* 문장 카드 */}
-      <div className="card-3d p-4">
-        <p className="mb-3 flex items-center gap-1.5 font-display text-lg text-grion-700">
-          <BookOpen size={20} strokeWidth={2.6} /> {item.ref}
+      <div className="card-3d p-3.5">
+        <p className="mb-2 flex items-center gap-1.5 text-base text-grion-700">
+          <BookOpen size={18} strokeWidth={2.6} /> {item.ref}
         </p>
-        <p className="text-[1.15rem] font-bold leading-[2.6rem] text-forest">
+        <p className="text-[1.08rem] leading-[2.2rem] text-forest">
           {parts.map((p, i) => {
             if (p.type === 'text') return <span key={i}>{p.value}</span>;
             const chipId = filled[p.index];
@@ -122,7 +119,7 @@ export default function FillRound({ items, api }) {
               <button
                 key={i}
                 onClick={() => clearSlot(p.index)}
-                className={`mx-1 inline-flex min-w-[4.2rem] items-center justify-center rounded-xl border-[3px] px-2 align-middle font-display text-lg leading-[2.1rem] transition ${
+                className={`mx-1 inline-flex min-w-[3.8rem] items-center justify-center rounded-xl border-[2.5px] px-2 align-middle text-base leading-[1.8rem] transition ${
                   isBad
                     ? 'animate-shake border-red-400 bg-red-50 text-red-600'
                     : isOk
@@ -141,7 +138,7 @@ export default function FillRound({ items, api }) {
       </div>
 
       {/* 단어 은행 */}
-      <div className="mt-6 flex flex-wrap justify-center gap-3">
+      <div className="mt-3.5 flex flex-wrap justify-center gap-2">
         {bank.map((b) => {
           const used = filled.includes(b.id);
           return (
@@ -149,7 +146,7 @@ export default function FillRound({ items, api }) {
               key={b.id}
               onClick={() => placeChip(b.id)}
               disabled={used}
-              className={`quiz-card px-4 py-2 font-display text-xl ${
+              className={`quiz-card px-3.5 py-1.5 text-lg ${
                 used ? '!border-gray-200 !bg-gray-100 text-transparent !shadow-none' : 'text-forest'
               }`}
             >
@@ -160,8 +157,8 @@ export default function FillRound({ items, api }) {
       </div>
 
       {!status && (
-        <div className="mt-8">
-          <button onClick={check} disabled={!allFilled} className="btn-3d btn-green w-full text-xl">
+        <div className="mt-4">
+          <button onClick={check} disabled={!allFilled} className="btn-3d btn-green w-full py-2.5 text-lg">
             확인하기
           </button>
         </div>
