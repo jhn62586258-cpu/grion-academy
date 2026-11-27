@@ -1,4 +1,10 @@
+import localFont from 'next/font/local';
 import './globals.css';
+
+const kotraHope = localFont({
+  src: '../public/images/KOTRAHOPE.ttf',
+  display: 'swap',
+});
 
 export const metadata = {
   title: '그리온 말씀 사관학교 (충진!)',
@@ -14,25 +20,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ko">
-      <head>
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-              @font-face {
-                font-family: 'KOTRAHOPE';
-                src: url('/images/KOTRAHOPE.ttf') format('truetype');
-                font-weight: normal;
-                font-style: normal;
-                font-display: swap;
-              }
-              html, body, * {
-                font-family: 'KOTRAHOPE', sans-serif !important;
-              }
-            `,
-          }}
-        />
-      </head>
+    <html lang="ko" className={kotraHope.className}>
       <body>{children}</body>
     </html>
   );
