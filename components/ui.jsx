@@ -32,20 +32,15 @@ export function Emblem({ size = 44 }) {
   );
 }
 
-/** 건빵 아이콘 */
+/** 건빵 아이콘 (지피티 생성 icon_hardtrack.png 적용) */
 export function BiscuitIcon({ size = 28 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="3" y="6" width="19" height="19" rx="4" fill="#f4c26b" stroke="#a8691c" strokeWidth="2" transform="rotate(-8 12 15)" />
-      <rect x="10" y="8" width="19" height="19" rx="4" fill="#f9d58d" stroke="#a8691c" strokeWidth="2" transform="rotate(7 19 17)" />
-      <g fill="#b7782a">
-        <circle cx="16" cy="14" r="1.1" />
-        <circle cx="22" cy="14" r="1.1" />
-        <circle cx="19" cy="19" r="1.1" />
-        <circle cx="25" cy="20" r="1.1" />
-        <circle cx="15" cy="22" r="1.1" />
-      </g>
-    </svg>
+    <img
+      src="/images/icon_hardtrack.png"
+      alt="건빵"
+      style={{ width: size, height: size }}
+      className="inline-block shrink-0 object-contain"
+    />
   );
 }
 
