@@ -1,36 +1,48 @@
 'use client';
 
 import { useState } from 'react';
-import { LogOut, Plus, Settings } from 'lucide-react';
+import { FileCheck2, LogOut, Plus, Settings } from 'lucide-react';
 import { useApp } from '@/lib/AppContext';
 import { RANKS } from '@/lib/ranks';
 import { titleLabel } from '@/lib/shop';
+import ExamModal from './ExamModal';
 import { GrionFace } from './Grion';
 import { BiscuitIcon, Emblem, RankBadge, Sheet } from './ui';
 
-/** 상단 타이틀 줄 + 설정(톱니) */
 export function Header({ subtitle }) {
   const { user, session, logout, rankIndex } = useApp();
   const [open, setOpen] = useState(false);
+  const [examOpen, setExamOpen] = useState(false);
 
   return (
     <>
-      <div className="flex items-center justify-between px-4 pb-1 pt-4">
-        <div className="flex items-center gap-2">
-          <Emblem size={46} />
-          <div className="leading-tight">
-            <h1 className="font-display text-[1.65rem] text-forest">그리온 말씀 사관학교</h1>
+      <div className="flex items-center justify-between px-3 pb-1 pt-4">
+        <div className="flex items-center gap-2 min-w-0">
+          <Emblem size={44} />
+          <div className="leading-tight truncate">
+            <h1 className="font-display text-[1.45rem] text-forest truncate">그리온 말씀 사관학교</h1>
             {subtitle ? <p className="-mt-0.5 text-xs font-bold text-grion-700">{subtitle}</p> : null}
           </div>
         </div>
-        <button
-          onClick={() => setOpen(true)}
-          aria-label="설정"
-          className="rounded-full border-2 border-white/80 bg-white/80 p-2.5 text-forest shadow active:scale-95"
-        >
-          <Settings size={22} />
-        </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={() => setExamOpen(true)}
+            className="flex items-center gap-1 rounded-full border-2 border-amber-400 bg-amber-50 px-2.5 py-1.5 text-xs font-bold text-amber-900 shadow active:scale-95"
+          >
+            <FileCheck2 size={16} className="text-amber-600" />
+            시험공부
+          </button>
+          <button
+            onClick={() => setOpen(true)}
+            aria-label="설정"
+            className="rounded-full border-2 border-white/80 bg-white/80 p-2 text-forest shadow active:scale-95"
+          >
+            <Settings size={20} />
+          </button>
+        </div>
       </div>
+
+      <ExamModal open={examOpen} onClose={() => setExamOpen(false)} />
 
       <Sheet open={open} onClose={() => setOpen(false)} title="군 생활 설정">
         <div className="space-y-4">
@@ -64,7 +76,6 @@ export function Header({ subtitle }) {
   );
 }
 
-/** 프로필 줄: 아바타 / 계급장 / 닉네임 / 건빵 잔액 (+ 누르면 PX) */
 export function ProfileStrip({ onGoShop }) {
   const { user, session, rankIndex } = useApp();
   const rank = RANKS[rankIndex];
