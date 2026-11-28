@@ -32,7 +32,7 @@ export default function Login() {
         pin,
       });
       if (isAdminNick) {
-        toast('🛡️ 관리자 모드로 접속했습니다!');
+        toast('관리자 모드로 접속했습니다!');
       } else {
         toast(res.isNew ? '입소를 환영합니다! 충진!' : '기존 진도를 불러왔어요. 충진!');
       }
@@ -40,9 +40,7 @@ export default function Login() {
       if (err?.message === 'ADMIN_PIN_MISMATCH') {
         setError('관리자 비밀번호(PIN)가 올바르지 않습니다.');
       } else if (err?.message === 'PIN_MISMATCH') {
-        setError(
-          '이미 등록된 닉네임이에요. PIN 4자리가 다르면 들어올 수 없어요. (기기를 바꾼 경우, 처음 정한 PIN을 입력해 주세요)'
-        );
+        setError('이미 등록된 닉네임이에요. PIN 4자리가 다르면 들어올 수 없어요.');
       } else {
         console.error(err);
         setError('연결에 실패했어요. 네트워크와 Firebase 설정을 확인해 주세요.');
@@ -75,7 +73,7 @@ export default function Login() {
           <span className="mb-1 block font-display text-lg text-forest">소속 반</span>
           {isAdminNick ? (
             <div className="w-full rounded-2xl border-[3px] border-amber-300 bg-amber-50 px-4 py-3 text-lg font-bold text-amber-800">
-              🛡️ 관리자 전용 (반 선택 불필요)
+              관리자 전용 (반 선택 불필요)
             </div>
           ) : (
             <select
